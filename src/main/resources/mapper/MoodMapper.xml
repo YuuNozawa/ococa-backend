@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="dev.ococa.api.infrastructure.repository.mood.MoodMapper">
+    <resultMap id="Mood" type="dev.ococa.api.domain.model.mood.Mood">
+        <result column="mood_id" property="moodId" />
+        <result column="user_id" property="userId" />
+        <result column="emotion_id" property="emotionId" />
+        <result column="picture_id" property="pictureId" />
+        <result column="mood_level" property="moodLevel" />
+        <result column="tag" property="tag" />
+        <result column="alt" property="alt" />
+        <result column="start_at" property="startAt" />
+        <result column="end_at" property="endAt" />
+        <result column="updated_at" property="updatedAt" />
+        <association property="note" javaType="dev.ococa.api.domain.model.mood.Note">
+            <result column="note" property="value" />
+        </association>
+    </resultMap>
+    <select id="findById" resultMap="Mood">
+        SELECT mood_id, user_id, emotion_id, picture_id, mood_level, tag, note, alt, start_at, end_at, updated_at
+        FROM moods where mood_id = #{id}
+    </select>
+    <select id="findByUserId" resultMap="Mood">
+        SELECT mood_id, user_id, emotion_id, picture_id, mood_level, tag, note, alt, start_at, end_at, updated_at
+        FROM moods where user_id = #{id}
+    </select>
+    <select id="getCombinedMoodsByUserId" resultMap="Mood">
+        SELECT mood_id, user_id, emotion_id, picture_id, mood_level, tag, note, alt, start_at, end_at, updated_at 
+        FROM moods 
+        INNER JOIN (
+            SELECT user_id1
+                  ,user_id2
+            FROM friends
+            WHERE user_id1 = #{id}
+               OR user_id2 = #{id}
+        ) f
+        ON user_id = user_id1
+        OR user_id = user_id2
+        ORDER BY start_at
+    </select>
+    <select id="getCombinedMoodStatusesByUserId" resultMap="Mood">
+        SELECT user_id
+              ,emotion_id
+              ,mood_level
+        FROM moods 
+        INNER JOIN (
+            SELECT user_id1
+                  ,user_id2
+            FROM friends
+            WHERE user_id1 = #{id}
+               OR user_id2 = #{id}
+        ) f
+        ON user_id = user_id1
+        OR user_id = user_id2
+        WHERE end_at IS NULL
+        ORDER BY start_at
+    </select>
+    <insert id="save" parameterType="dev.ococa.api.domain.model.mood.Mood">
+        INSERT INTO moods (
+             mood_id
+            ,user_id
+            ,emotion_id
+            ,picture_id
+            ,mood_level
+            ,tag
+            ,alt
+            ,note
+            ,start_at
+            ,end_at
+            ,updated_at
+        ) VALUES (
+             #{moodId}
+            ,#{userId}
+            ,#{emotionId}
+            ,#{pictureId}
+            ,#{moodLevel}
+            ,#{tag}
+            ,#{alt}
+            ,#{note.value}
+            ,DEFAULT
+            ,NULL
+            ,DEFAULT
+        )
+        ON DUPLICATE KEY UPDATE
+             picture_id = #{pictureId}
+            ,tag = #{tag}
+            ,note = #{note.value}
+            ,end_at = #{endAt}
+            ,updated_at = NOW()
+    </insert>
+    <delete id="deleteOne">
+        DELETE FROM moods WHERE mood_id= #{id}
+    </delete>
+</mapper>

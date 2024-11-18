@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="dev.ococa.api.infrastructure.repository.mood.LikeMapper">
+    <select id="findById" resultType="dev.ococa.api.domain.model.mood.Like">
+        SELECT mood_id, user_id, like_date, time_zone
+        FROM mood_likes 
+        WHERE mood_id = #{moodId}
+    </select>
+    <select id="findByIds" resultType="dev.ococa.api.domain.model.mood.Like">
+        SELECT mood_id, user_id, like_date, time_zone
+        FROM mood_likes 
+        WHERE mood_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <insert id="save" parameterType="dev.ococa.api.domain.model.mood.Like">
+        INSERT IGNORE INTO mood_likes (
+            mood_id
+           ,user_id
+           ,like_date
+           ,time_zone
+       ) VALUES (
+            #{moodId}
+           ,#{userId}
+           ,#{likeDate}
+           ,#{timeZone}
+       )
+    </insert>
+</mapper>

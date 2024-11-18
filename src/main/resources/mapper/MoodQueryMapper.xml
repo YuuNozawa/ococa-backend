@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="dev.ococa.api.infrastructure.query.mood.MoodQueryMapper">
+    <resultMap id="MoodBody" type="dev.ococa.api.application.service.mood.MoodBodyQueryResponseDto">
+        <result column="mood_id" property="moodId" />
+        <result column="user_id" property="userId" />
+        <result column="emotion_id" property="emotionId" />
+        <result column="picture_id" property="pictureId" />
+        <result column="mood_level" property="moodLevel" />
+        <result column="tag" property="tag" />
+        <result column="alt" property="alt" />
+        <result column="start_at" property="startAt" />
+        <result column="end_at" property="endAt" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="like_count" property="likeCount" />
+        <result column="view_count" property="viewCount" />
+        <result column="liked_by_current_user" property="likedByCurrentUser" />
+        <association property="note" javaType="dev.ococa.api.domain.model.mood.Note">
+            <result column="note" property="value" />
+        </association>
+    </resultMap>
+    <select id="getMoodBodyByUserId" resultMap="MoodBody">
+        SELECT m.*
+              ,ifNull(ml.like_count, 0) as like_count
+             ,ifNull(mv.view_count, 0) as view_count
+             ,ifNull(ml.liked_by_current_user, false) as liked_by_current_user
+        FROM moods m
+        INNER JOIN (
+            SELECT 
+                CASE user_id1 
+                    WHEN #{id}
+                    THEN user_id2
+                    ELSE user_id1
+                END as user_id
+            FROM friends
+            WHERE user_id1 = #{id}
+               OR user_id2 = #{id}
+            UNION ALL
+            SELECT #{id} FROM DUAL
+        ) f
+        ON m.user_id = f.user_id
+        LEFT JOIN (
+            SELECT 
+                 mood_id
+                ,count(1) AS like_count
+                ,MAX(CASE WHEN user_id = #{id} THEN true ELSE false END) AS liked_by_current_user
+            FROM mood_likes 
+            GROUP BY mood_id
+        ) ml
+        ON m.mood_id = ml.mood_id
+        LEFT JOIN (
+             SELECT 
+                 mood_id
+                ,count(1) AS view_count
+            FROM mood_views 
+            GROUP BY mood_id
+        ) mv
+        ON m.mood_id = mv.mood_id
+        ORDER BY m.user_id, m.start_at
+    </select>
+    <resultMap id="LikedUser" type="dev.ococa.api.application.service.mood.LikedUserQueryResponseDto">
+        <result column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
+        <result column="icon" property="icon" />
+        <result column="color" property="color" />
+        <result column="bio" property="bio" />
+        <result column="like_date" property="likeDate" />
+        <result column="time_zone" property="timeZone" />
+    </resultMap>
+    <select id="getLikedUserByMoodId" resultMap="LikedUser">
+        SELECT u.user_id, u.user_name, u.icon, u.color, u.bio
+        FROM users u
+        INNER JOIN mood_likes ml
+        ON u.user_id = ml.user_id
+        WHERE ml.mood_id = #{moodId}
+    </select>
+    <resultMap id="ViewedUser" type="dev.ococa.api.application.service.mood.ViewedUserQueryResponseDto">
+        <result column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
+        <result column="icon" property="icon" />
+        <result column="color" property="color" />
+        <result column="bio" property="bio" />
+        <result column="view_date" property="viewDate" />
+        <result column="time_zone" property="timeZone" />
+    </resultMap>
+    <select id="getViewedUserByMoodId" resultMap="ViewedUser">
+        SELECT u.user_id, u.user_name, u.icon, u.color, u.bio
+        FROM users u
+        INNER JOIN mood_views mv
+        ON u.user_id = mv.user_id
+        WHERE mv.mood_id = #{moodId}
+    </select>
+</mapper>

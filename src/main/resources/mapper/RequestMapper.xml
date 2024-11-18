@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="dev.ococa.api.infrastructure.repository.RequestMapper">
+    <select id="getRequestsById" resultType="dev.ococa.api.domain.model.RequestEntity">
+        SELECT * FROM requests WHERE requester_id = #{id} OR requestee_id = #{id}
+    </select>
+</mapper>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="dev.ococa.api.infrastructure.repository.like.MoodLikeMapper">
+    <insert id="insertLike" parameterType="dev.ococa.api.domain.model.like.Like">
+        INSERT IGNORE INTO mood_likes (
+            mood_id
+           ,user_id
+           ,like_date
+           ,time_zone
+       ) VALUES (
+            #{moodId}
+           ,#{userId}
+           ,#{likeDate}
+           ,#{timeZone}
+       )
+    </insert>
+    <delete id="cancelLike">
+        DELETE FROM mood_likes 
+        WHERE mood_id= #{moodId} 
+          AND user_id = #{userId}
+    </delete>
+</mapper>
