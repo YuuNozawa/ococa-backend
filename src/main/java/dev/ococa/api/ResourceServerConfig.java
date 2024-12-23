@@ -25,7 +25,10 @@ public class ResourceServerConfig {
     @Bean
     public SecurityFilterChain resourceServerSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/actuator/prometheus").permitAll()
+                .anyRequest().authenticated()
+            )
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
                 jwt.decoder(jwtDecoder());
             }))
@@ -35,8 +38,15 @@ public class ResourceServerConfig {
             );
         return http.build();
     }
+
+    // JWTデコーダーを定義するメソッド
+    // リソースサーバーが受け取ったJWTトークンを検証・解析するために使用する
     @Bean
     public JwtDecoder jwtDecoder() {
+        // 発行者のURLからJWTデコーダーを生成する.
+        // JwtDecoders.fromIssuerLocationメソッドは、指定された発行者（issuer）の情報を使って、
+        // JWTの検証に必要な公開鍵や設定を自動的に取得する.
+        // これによりトークンの署名を検証し、トークンが信頼できるものであることを確認できる.
         return JwtDecoders.fromIssuerLocation(issuerLocation);
     }
     @Bean
