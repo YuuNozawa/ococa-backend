@@ -1,4 +1,4 @@
-package dev.ococa.api.presentation;
+package dev.ococa.api.presentation.mood;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
