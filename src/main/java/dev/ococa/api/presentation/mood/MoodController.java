@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,7 +38,9 @@ public class MoodController {
     }
 
     @PostMapping("/api/mood")
-    public ResponseEntity<MoodPostResponseDto> createMood(@AuthenticationPrincipal Jwt jwt, @RequestBody MoodPostRequestDto dto) {
+    public ResponseEntity<MoodPostResponseDto> createMood(
+        @AuthenticationPrincipal Jwt jwt, 
+        @Validated @RequestBody MoodPostRequestDto dto) {
         String userId = jwt.getSubject();
         MoodPostResponseDto response = moodService.insertMood(userId, dto);
         return ResponseEntity.ok().body(response);

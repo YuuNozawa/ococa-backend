@@ -8,10 +8,12 @@ import dev.ococa.api.domain.model.mood.Note;
 import dev.ococa.api.domain.model.view.MoodViewEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter(AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class MoodPostResponseDto {
     private String moodId;
     private String userId;

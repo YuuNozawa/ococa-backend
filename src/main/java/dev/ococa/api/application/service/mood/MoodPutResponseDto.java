@@ -6,9 +6,11 @@ import dev.ococa.api.domain.model.mood.Note;
 import dev.ococa.api.presentation.mood.MoodPutRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class MoodPutResponseDto {
     static MoodPutResponseDto of(MoodPutRequestDto body) {
         return new MoodPutResponseDto(

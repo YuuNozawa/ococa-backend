@@ -26,6 +26,10 @@ public class ResourceServerConfig {
     public SecurityFilterChain resourceServerSecurityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**"
+                ).permitAll()
                 .requestMatchers("/actuator/prometheus").permitAll()
                 .anyRequest().authenticated()
             )
