@@ -21,8 +21,6 @@ import dev.ococa.api.application.service.mood.MoodPutResponseDto;
 import dev.ococa.api.application.service.mood.MoodService;
 import dev.ococa.api.domain.model.mood.Note;
 import dev.ococa.api.infrastructure.query.mood.MoodQueryService;
-import dev.ococa.api.presentation.mood.MoodController;
-import dev.ococa.api.presentation.mood.MoodPutRequestDto;
 
 @WebMvcTest(MoodController.class)
 public class MoodControllerUpdateTest {
@@ -71,6 +69,26 @@ public class MoodControllerUpdateTest {
 
         // サービス層への呼び出しが正しく行われていること
         Mockito.verify(moodService).rewriteBody(eq("1234"), eq("alice"), any(MoodPutRequestDto.class));
+    }
+
+    @Test
+    public void testUpdateMood_InvalidInput() throws Exception {
+        MoodPutRequestDto req = MoodPutRequestDto.builder().moodId(null).build();
+
+        String jsonRequest = mapper.writeValueAsString(req);
+
+        mockMvc.perform(
+            put("/api/mood/1234")
+            .with(jwt().jwt(builder -> builder.subject("alice")))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRequest)
+        )
+        .andExpect(status().isBadRequest());
+        
+        Mockito
+            .verify(moodService, Mockito.never())
+            .rewriteBody(any(String.class), any(String.class), any(MoodPutRequestDto.class));
+
     }
 
 }

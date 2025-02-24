@@ -41,13 +41,18 @@ public class MoodController {
     public ResponseEntity<MoodPostResponseDto> createMood(
         @AuthenticationPrincipal Jwt jwt, 
         @Validated @RequestBody MoodPostRequestDto dto) {
+
         String userId = jwt.getSubject();
         MoodPostResponseDto response = moodService.insertMood(userId, dto);
         return ResponseEntity.ok().body(response);
     }
 
     @PutMapping("/api/mood/{id}")
-    public ResponseEntity<MoodPutResponseDto> updateMood(@PathVariable String id, @AuthenticationPrincipal Jwt jwt, @RequestBody MoodPutRequestDto dto) {
+    public ResponseEntity<MoodPutResponseDto> updateMood(
+        @PathVariable String id, 
+        @AuthenticationPrincipal Jwt jwt, 
+        @Validated @RequestBody MoodPutRequestDto dto) {
+
         String userId = jwt.getSubject();
         MoodPutResponseDto response = moodService.rewriteBody(id, userId, dto);
         return ResponseEntity.ok().body(response);
